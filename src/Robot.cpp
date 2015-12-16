@@ -140,7 +140,7 @@ private:
 		SmartDashboard::PutNumber("Gyro", GetGyroAngle());
 
 		if(pStick->GetRawButton(1)) {
-			DriveToTarget(5120);
+			DriveToTarget(5.0f * 39.3701f); //39.3701 inches convert to 1 meter
 		}
 	}
 
