@@ -1,8 +1,8 @@
 #include "WPILib.h"
+#include "RobotMap.h"
 
 class Robot: public IterativeRobot
 {
-	const float rWidth = 2; //robot width in meters
 
 	RobotDrive* pMyRobot = 0; // robot drive system
 	CANTalon* pMotorLeft = 0;
@@ -20,26 +20,26 @@ public:
 	Robot()
 {
 
-		pGyro = new Gyro(0);
+		pGyro = new Gyro(GYRO1_PORT);
 		pGyro->Reset();
-		pGyro->SetSensitivity(0.007); //magic number used by legendary programmers
+		pGyro->SetSensitivity(GYRO_SENSITIVITY); //magic number used by legendary programmers
 
-		pEncoderLeft = new Encoder(2, 3, false, Encoder::k4X);
+		pEncoderLeft = new Encoder(ENCODER1_A_PORT, ENCODER1_B_PORT, false, Encoder::k4X);
 		// Defines how far the mechanism attached to the encoder moves per pulse.
 		// In this case, we assume that a 360 count encoder is directly attached
 		//  to a 3 inch diameter (1.5inch radius) wheel, and that we want to
 		//  measure distance in inches.
 		//  myEncoder.SetDistancePerPulse(1.0 / 360.0 * 2.0 * 3.1415 * 1.5);
-		pEncoderLeft->SetDistancePerPulse(0.1665); // magic number used by robot last year
+		pEncoderLeft->SetDistancePerPulse(ENCODER_DIST_PER_PULSE); // magic number used by robot last year
 		pEncoderLeft->Reset(); //resets values
 
-		pEncoderRight = new Encoder(1, 0, false, Encoder::k4X);
-		pEncoderRight->SetDistancePerPulse(0.1665);
+		pEncoderRight = new Encoder(ENCODER2_A_PORT, ENCODER2_A_PORT, false, Encoder::k4X);
+		pEncoderRight->SetDistancePerPulse(ENCODER_DIST_PER_PULSE);
 		pEncoderRight->Reset();
 
 		ConfigurePID(1.0f, 0.0f, 0.0f);//this does not change PID of the motors unless you say pMotorLeft->SetPID(kP, kI, kD);
 
-		pMotorLeft = new CANTalon(1);
+		pMotorLeft = new CANTalon(TALON_1_PORT);
 		// This sets the mode of the m_motor. The options are:
 		// kPercentVbus: basic throttle; no closed-loop.
 		// kCurrent: Runs the motor with the specified current if possible.
@@ -69,7 +69,7 @@ public:
 		//   speeds.
 		pMotorLeft->SetPID(kP, kI, kD);
 
-		pMotorRight = new CANTalon(2);
+		pMotorRight = new CANTalon(TALON_2_PORT);
 		pMotorRight->SetControlMode(CANSpeedController::kPosition);
 		pMotorRight->SetFeedbackDevice(CANTalon::QuadEncoder);
 		pMotorRight->SetPID(kP, kI, kD);
@@ -77,7 +77,7 @@ public:
 		pMyRobot = new RobotDrive( pMotorLeft, pMotorRight );
 		pMyRobot->SetExpiration(0.1);
 
-		pStick = new Joystick(0);
+		pStick = new Joystick(LOGITECH_PORT);
 
 
 }
@@ -156,8 +156,8 @@ private:
 	}
 
 	void DriveToTarget(int ticks){
-		pMotorLeft->Set(5120); //encoder ticks
-		pMotorRight->Set(5120);
+		pMotorLeft->Set(ticks); //encoder ticks
+		pMotorRight->Set(ticks);
 	}
 
 	float GetGyroAngle(){
@@ -170,7 +170,7 @@ private:
 	}
 
 	void SetupTurnTarget(float degree){
-		float travelDistance = rWidth * 3.14159f * degree / 360.0f;
+		float travelDistance = ROBOT_WIDTH * PI * degree / 360.0f;
 		turnEncoderTick = travelDistance * 39.3701f; //meter to inch
 	}
 
